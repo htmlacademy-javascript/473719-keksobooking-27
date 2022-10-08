@@ -1,68 +1,27 @@
 function randomInteger(min, max) {
   // получить случайное число –решение взял отсюда: https://learn.javascript.ru/task/random-int-min-max
-  if (min < 0) {
-    let random = NaN;
-    return random;
-  }
-
-  if (max < 0) {
-    let random = NaN;
-    return random;
-  }
-
-  if (min > max) {
-    let random = NaN;
-    return random;
+  if (min < 0 || max < 0 || min > max) {
+    return NaN;
   }
 
   let random = min - 0.5 + Math.random() * (max - min + 1);
   return Math.round(random);
 }
 
-console.log("Рандомное число - " + randomInteger(1, 100));
+console.log("Рандомное число - " + randomInteger(1, 90));
 
 
 function randomCoordinatesInteger(min, max, roundingTo) {
-  if (min < 0) {
-    let randCoordinate = NaN;
-    return randCoordinate;
+  if (min < 0 || max < 0 || roundingTo < 0 || min > max) {
+    return NaN;
   }
 
-  if (max < 0) {
-    let randCoordinate = NaN;
-    return randCoordinate;
-  }
-
-  if (roundingTo < 0) {
-    let randCoordinate = NaN;
-    return randCoordinate;
-  }
-
-  if (min > max) {
-    let randCoordinate = NaN;
-    return randCoordinate;
-  }
-
-  // https://qna.habr.com/q/493201
-
-  const lengthMin = min.toString().match(/\.(\d+)/) ?.[1].length;
-  const lengthMax = max.toString().match(/\.(\d+)/) ?.[1].length;
-
-  if (lengthMin != undefined)
-    if (lengthMin > roundingTo) {
-      let randCoordinate = NaN;
-      return randCoordinate;
-    }
-
-  if (lengthMax != undefined)
-    if (lengthMax > roundingTo) {
-      let randCoordinate = NaN;
-      return randCoordinate;
-    }
+  const minRounded = min.toFixed(roundingTo);
+  const maxRounded = max.toFixed(roundingTo);
 
   let multiplier = Math.pow(10, roundingTo);
-  let randCoordinate = Math.round(min - 0.5 + Math.random() * (max - min + 1) * multiplier) / multiplier;
-  return randCoordinate;
+  let randomCoordinate = Math.round(minRounded - 0.5 + Math.random() * (maxRounded - minRounded + 1) * multiplier) / multiplier;
+  return randomCoordinate;
 }
 
-console.log("Рандомная координата - " + randomCoordinatesInteger(1.23, 12.77, 3));
+console.log("Рандомная координата - " + randomCoordinatesInteger(1.23222, 12.77, 2));
