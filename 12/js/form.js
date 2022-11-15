@@ -209,6 +209,8 @@ const resetForm = () => {
   resetMap(starterPoint);
 };
 
+//вынести в утилс
+
 const okMessageTemplate = document.querySelector('#success').content.querySelector('.success');
 const okMessage = okMessageTemplate.cloneNode(true);
 const errorsMessageTemplate = document.querySelector('#error').content.querySelector('.error');
@@ -256,32 +258,32 @@ const messageError = () => {
 
 adForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
-  deactivateForm();
   const isValid = pristine.validate();
-  if (isValid) {
-    const formData = new FormData(evt.target);
-    fetch('https://27.javascript.pages.academy/keksobooking', {
-        method: 'POST',
-        body: formData,
-      })
-      .then((response) => {
-        if (response.ok) {
-          messageSucced();
-          resetForm();
-        } else {
-          messageError();
-          resetForm();
-        }
-      })
-      .catch(() => {
+  if (!isValid) {
+    return;
+  };
+  const formData = new FormData(evt.target);
+  deactivateForm();
+  fetch('https://27.javascript.pages.academy/keksobooking', {
+      method: 'POST',
+      body: formData,
+    })
+    .then((response) => {
+      if (response.ok) {
+        messageSucced();
+        resetForm();
+        activateForm();
+      } else {
         messageError();
         resetForm();
-      });
-  } else {
-    messageError();
-    resetForm();
-  };
-  activateForm();
+        activateForm();
+      }
+    })
+    .catch(() => {
+      messageError();
+      resetForm();
+      activateForm();
+    });
 });
 
 resetButton.addEventListener('click', (evt) => {
