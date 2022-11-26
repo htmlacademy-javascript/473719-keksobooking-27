@@ -13,20 +13,24 @@ import {
   activateForm,
   deactivateForm,
   onFormSubmit,
-  resetAll
+  resetAll,
+  deactivateFilters,
+  activateFilters
 } from './form.js';
 import './preview.js';
 
 const dataSource = 'https://27.javascript.pages.academy/keksobooking/data';
 
 deactivateForm();
+deactivateFilters();
 
 fetch(dataSource)
   .then((response) => response.json())
   .then((packages) => {
     resetMap(STARTER_POINT);
-    createMapMarkers(packages.slice(0, QUANTITY_OF_RENDERED_BUBBLES));
     activateForm();
+    createMapMarkers(packages.slice(0, QUANTITY_OF_RENDERED_BUBBLES));
+    activateFilters();
     changeFilter(packages, createMapMarkers);
     onFormSubmit(packages.slice(0, QUANTITY_OF_RENDERED_BUBBLES));
     resetAll(packages.slice(0, QUANTITY_OF_RENDERED_BUBBLES));

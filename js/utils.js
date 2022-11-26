@@ -1,3 +1,5 @@
+import { isEscKey } from './keyboard.js';
+
 const MESSAGE_DISPOSAL_TIME = 5000;
 
 const debounce = (callback, timeoutDelay = 500) => {
@@ -8,18 +10,6 @@ const debounce = (callback, timeoutDelay = 500) => {
   };
 };
 
-const throttle = (callback, delayBetweenFrames) => {
-  let lastTime = 0;
-
-  return (...rest) => {
-    const now = new Date();
-    if (now - lastTime >= delayBetweenFrames) {
-      callback.apply(this, rest);
-      lastTime = now;
-    }
-  };
-};
-
 const okMessageTemplate = document.querySelector('#success').content.querySelector('.success');
 const okMessage = okMessageTemplate.cloneNode(true);
 const errorsMessageTemplate = document.querySelector('#error').content.querySelector('.error');
@@ -27,14 +17,14 @@ const errorsMessage = errorsMessageTemplate.cloneNode(true);
 const bodyElement = document.querySelector('body');
 
 const onOkMessageEscKeydown = (evt) => {
-  if (evt.key === 'Escape') {
+  if (isEscKey(evt)) {
     okMessage.remove();
     document.removeEventListener('keydown', onOkMessageEscKeydown);
   }
 };
 
 const onErrorMessageEscKeydown = (evt) => {
-  if (evt.key === 'Escape') {
+  if (isEscKey(evt)) {
     errorsMessage.remove();
     document.removeEventListener('keydown', onErrorMessageEscKeydown);
   }
@@ -68,7 +58,6 @@ const sendErrorMessage = () => {
 
 export {
   debounce,
-  throttle,
   sendErrorMessage,
   sendSuccedMessage
 };

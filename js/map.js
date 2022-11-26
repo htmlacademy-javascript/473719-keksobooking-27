@@ -4,11 +4,11 @@ import {
   createCard
 } from './render-cards.js';
 
-const ROUNDING_NUMBER = 6;
+const ROUNDING_NUMBER = 5;
 
 const STARTER_POINT = {
-  lat: 35.652832,
-  lng: 139.839478,
+  lat: 35.65283,
+  lng: 139.83947,
 };
 
 const mainPinIcon = L.icon({

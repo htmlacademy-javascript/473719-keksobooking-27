@@ -118,6 +118,7 @@ const changeFilter = (offers, callback) => {
   }));
 };
 
+
 export {
   changeFilter, QUANTITY_OF_RENDERED_BUBBLES, resetFilter
 };

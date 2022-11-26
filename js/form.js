@@ -18,7 +18,7 @@ import {
   resetFilter
 } from './filtring.js';
 
-const SLIDER_PACE = 100;
+const SLIDER_PACE = 1;
 
 const HEADER_LENGTH = {
   min: 30,
@@ -47,9 +47,6 @@ const ALL_OPTIONS = {
 const POSTING_ADDRESS = 'https://27.javascript.pages.academy/keksobooking';
 
 const adForm = document.querySelector('.ad-form');
-const adFormFieldsets = adForm.querySelectorAll('fieldset');
-const adFormSlider = adForm.querySelector('.ad-form__slider');
-const adFormMapFilters = document.querySelector('.map__filters');
 const actualProperty = adForm.querySelector('#price');
 const variants = adForm.querySelector('#type');
 const rooms = adForm.querySelector('#room_number');
@@ -58,27 +55,32 @@ const actualTimeIn = adForm.querySelector('#timein');
 const actualTimeOut = adForm.querySelector('#timeout');
 const resetButton = adForm.querySelector('.ad-form__reset');
 
-const deactivateForm = () => {
-  adForm.classList.add('ad-form--disabled');
-  adFormFieldsets.forEach((adFormFieldset) => {
-    adFormFieldset.disabled = true;
+const switchStateElements = (elements, status) => {
+  elements.forEach((element) => {
+    element.disabled = status;
   });
-  adFormSlider.disabled = true;
-  adFormSlider.classList.add('ad-form__slider--disabled');
-  adFormMapFilters.disabled = true;
-  adFormMapFilters.classList.add('map__filters--disabled');
 };
 
-const activateForm = () => {
-  adForm.classList.remove('ad-form--disabled');
-  adFormFieldsets.forEach((adFormFieldset) => {
-    adFormFieldset.disabled = false;
-  });
-  adFormSlider.disabled = false;
-  adFormSlider.classList.remove('ad-form__slider--disabled');
-  adFormMapFilters.disabled = false;
-  adFormMapFilters.classList.remove('map__filters--disabled');
+const switchFormStatus = (status) => {
+  const fieldsets = adForm.querySelectorAll('fieldset');
+  adForm.classList.toggle('ad-form--disabled', status);
+  switchStateElements(fieldsets, status);
 };
+
+const switchFiltersStatus = (status) => {
+  const filters = document.querySelector('.map__filters');
+  const selects = filters.querySelectorAll('select');
+  const fieldsets = filters.querySelectorAll('fieldset');
+  filters.classList.toggle('map__filters--disabled', status);
+  switchStateElements(selects, status);
+  switchStateElements(fieldsets, status);
+};
+
+const deactivateForm = () => switchFormStatus(true);
+const activateForm = () => switchFormStatus(false);
+const deactivateFilters = () => switchFiltersStatus(true);
+const activateFilters = () => switchFiltersStatus(false);
+
 
 const pristine = new Pristine(adForm, {
   classTo: 'ad-form__element',
@@ -160,8 +162,8 @@ capacity.addEventListener('change', () => {
   pristine.validate(capacity);
 });
 
-const onUnitChange = () => {
-  actualProperty.placeholder = MINIMAL_PRICE_LISTING[this.value];
+const onUnitChange = (evt) => {
+  actualProperty.placeholder = MINIMAL_PRICE_LISTING[evt.target];
   pristine.validate(actualProperty);
 };
 
@@ -203,14 +205,15 @@ noUiSlider.create(sliderElement, {
   start: minPropertyPrice,
   step: SLIDER_PACE,
   connect: 'lower',
+  format: {
+    to: (value) => value.toFixed(0),
+    from: (value) => parseFloat(value),
+  }
 });
 
-sliderElement.noUiSlider.on('update', () => {
-  actualProperty.value = sliderElement.noUiSlider.get();
-  pristine.validate(actualProperty);
-});
+actualProperty.value = sliderElement.noUiSlider.get();
 
-actualProperty.addEventListener('input', () => {
+actualProperty.addEventListener('change', () => {
   sliderElement.noUiSlider.set(actualProperty.value);
 });
 
@@ -221,14 +224,24 @@ variants.addEventListener('change', () => {
       min: minPropertyPrice,
       max: MAX_PRICE,
     },
-    start: minPropertyPrice,
-    step: SLIDER_PACE
+    start: actualProperty.value,
+    step: SLIDER_PACE,
   });
 });
 
+sliderElement.noUiSlider.on('slide', () => {
+  actualProperty.value = sliderElement.noUiSlider.get();
+  pristine.validate(actualProperty);
+});
+
+const resetPrice = () => {
+  sliderElement.noUiSlider.set(MINIMAL_PRICE_LISTING.flat);
+  actualProperty.value = MINIMAL_PRICE_LISTING.flat;
+};
+
 const resetForm = () => {
   adForm.reset();
-  sliderElement.noUiSlider.set(actualProperty.value);
+  resetPrice();
   resetMap(STARTER_POINT);
   resetFilter();
 };
@@ -239,7 +252,7 @@ const onFormSubmit = (packages) => {
     if (pristine.validate()) {
       const formData = new FormData(evt.target);
       deactivateForm();
-
+      deactivateFilters();
       fetch(POSTING_ADDRESS, {
         method: 'POST',
         body: formData,
@@ -252,11 +265,13 @@ const onFormSubmit = (packages) => {
             resetImage();
             createMapMarkers(packages);
             activateForm();
+            activateFilters();
           } else {
             sendErrorMessage();
             pristine.reset();
             createMapMarkers(packages);
             activateForm();
+            activateFilters();
           }
         })
         .catch(() => {
@@ -264,6 +279,7 @@ const onFormSubmit = (packages) => {
           pristine.reset();
           createMapMarkers(packages);
           activateForm();
+          activateFilters();
         });
     }
   });
@@ -283,5 +299,7 @@ export {
   deactivateForm,
   activateForm,
   resetAll,
-  onFormSubmit
+  onFormSubmit,
+  activateFilters,
+  deactivateFilters
 };

@@ -10,6 +10,7 @@ const photoPreview = document.querySelector('.ad-form__photo');
 
 const initializeImagePreview = () => {
   const imageForPreview = document.createElement('img');
+
   photoPreview.append(imageForPreview);
   imageForPreview.width = IMAGE_WIDTH;
   imageForPreview.height = IMAGE_HEIGHT;
@@ -18,7 +19,6 @@ const initializeImagePreview = () => {
 };
 
 const changeImage = (input, output) => {
-// выделить обработчик отдельный
   input.addEventListener('change', () => {
     const preview = output;
     const file = input.files[0];
@@ -33,7 +33,6 @@ const changeImage = (input, output) => {
 
 const resetImage = () => {
   photoPreview.innerHTML = '';
-  // этот обработчик удалить
   changeImage(photoChooser, initializeImagePreview());
 };
 
